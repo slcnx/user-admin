@@ -1,0 +1,52 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+- ../../base
+- configmap.yaml
+
+patches:
+- patch: |-
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: deploy
+    spec:
+      template:
+        spec:
+          containers:
+          - name: deploy 
+            resources:
+              requests:
+                cpu: 10m
+                memory: 32Mi
+              requests:
+                cpu: 10m
+                memory: 32Mi
+- patch: |-
+    - op: replace
+      path: /spec/template/spec/containers/0/name
+      value: user-admin
+  target:
+    kind: Deployment
+    name: deploy
+
+
+
+namePrefix: user-admin-
+
+images:
+- name: image_name
+  newName: nginx
+  newTag: mainline-alpine-perl
+replicas:
+- count: 10
+  name: deploy
+commonAnnotations:
+  cpu-set: "true"
+namespace: prod
+
+commonLabels:
+  app: user-admin
+  environment: prod
+
